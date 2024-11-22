@@ -118,3 +118,23 @@ Using VMware Workstation:
 ├── README.md                # Project Documentation
 ├── images/                  # Screenshots of configurations
 └── configurations/          # Exported pfSense configuration backups
+
+
+
+### Progress
+
+- **Networking Configuration**: ✅ Completed
+    - Virtual networks configured using VMware:
+        - VMnet8 (NAT): Configured as WAN (`192.168.150.0/24`).
+        - VMnet1 (Host-only): Configured as LAN (`192.168.170.0/24`).
+    - pfSense installed and routing LAN-to-WAN traffic successfully.
+    - DNS issues resolved using Google DNS (`8.8.8.8`, `8.8.4.4`).
+
+- **Firewall/Router Setup (pfSense)**: ✅ Completed
+    - Configured pfSense with WAN and LAN interfaces.
+    - Enabled DHCP for the LAN with IP range `192.168.170.100 - 192.168.170.150`.
+    - Verified LAN-to-WAN connectivity and internet access.
+
+- **LAN Client Setup**: ✅ Completed
+    - Ubuntu VM connected to pfSense LAN and received IP via DHCP.
+    - Verified internet access from the Ubuntu VM and tested DNS resolution.
