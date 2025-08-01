@@ -1,1 +1,2 @@
-
+Splunk
+wget -O splunk-10.0.0-e8eb0c4654f8-windows-x64.msi "https://download.splunk.com/products/splunk/releases/10.0.0/windows/splunk-10.0.0-e8eb0c4654f8-windows-x64.msi"
