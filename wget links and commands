@@ -1,1 +1,3 @@
-/root/splunkforwarder/bin/splunk add monitor /var/lib/docker/containers/ -sourcetype docker_json -index main
+Download Splunk
+wget -O splunkforwarder-10.0.0-e8eb0c4654f8-linux-amd64.tgz "https://download.splunk.com/products/universalforwarder/releases/10.0.0/linux/splunkforwarder-10.0.0-e8eb0c4654f8-linux-amd64.tgz"
+
