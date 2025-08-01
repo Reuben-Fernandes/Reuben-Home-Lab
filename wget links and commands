@@ -1,1 +1,69 @@
-wget -O splunkforwarder-10.0.0-e8eb0c4654f8-linux-amd64.deb "https://download.splunk.com/products/universalforwarder/releases/10.0.0/linux/splunkforwarder-10.0.0-e8eb0c4654f8-linux-amd64.deb"
+Here's your **step-by-step Splunk Universal Forwarder setup guide**, fully formatted for GitHub Markdown:
+
+---
+
+````markdown
+## 🧰 Step-by-Step Guide: Install Splunk Universal Forwarder on Ubuntu (Docker Host)
+
+### 1. 📦 Download & Install Splunk UF
+
+```bash
+wget -O splunkforwarder.deb "https://download.splunk.com/products/universalforwarder/releases/9.2.1/linux/splunkforwarder-9.2.1-<build>-linux-2.6-amd64.deb"
+sudo dpkg -i splunkforwarder.deb
+````
+
+> Replace `<build>` with the correct version from the [Splunk UF downloads](https://www.splunk.com/en_us/download/universal-forwarder.html).
+
+---
+
+### 2. 🚀 Enable and Start Splunk UF
+
+```bash
+sudo /opt/splunkforwarder/bin/splunk start --accept-license
+sudo /opt/splunkforwarder/bin/splunk enable boot-start
+```
+
+---
+
+### 3. 🎯 Add the Deployment Server / Indexer Info
+
+```bash
+sudo /opt/splunkforwarder/bin/splunk add forward-server <splunk-server-ip>:9997
+```
+
+> Replace `<splunk-server-ip>` with your Splunk Indexer’s IP address.
+
+---
+
+### 4. 📡 Monitor Docker and System Logs
+
+```bash
+sudo /opt/splunkforwarder/bin/splunk add monitor /var/lib/docker/containers/
+```
+
+Optional:
+
+```bash
+sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/syslog
+sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/auth.log
+```
+
+---
+
+### 5. 🔄 Monitor Docker Events (Optional)
+
+```bash
+docker events >> /var/log/docker_events.log
+sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/docker_events.log
+```
+
+---
+
+> ✅ At this point, your Splunk Universal Forwarder will collect Docker logs, system logs, and container events, and send them to your Splunk Indexer for ingestion and analysis.
+
+```
+
+---
+
+Let me know if you'd like a **section header image**, **badge icons**, or **architecture diagram** for the same README. I can even make you a `bash` setup script based on this.
+```
