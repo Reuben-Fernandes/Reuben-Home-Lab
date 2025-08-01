@@ -1,2 +1,1 @@
-/root/splunkforwarder/bin/splunk add monitor /var/lib/docker/containers/*/*.log
-
+/root/splunkforwarder/bin/splunk add monitor /var/lib/docker/containers/ -sourcetype docker_json -index main
