@@ -1,52 +1,97 @@
-# 🧪 Cybersecurity Homelab – Proxmox Edition
+# 🛡️ Cybersecurity Homelab Deployment – Hands-On Security Engineering Lab
 
-A hands-on cybersecurity lab designed to simulate real-world networks, attacks, and defenses — built from scratch using Proxmox, Docker, Kali, PFsense, and more.
-
-## 🛰️ Lab Overview
-
-This homelab replicates a small enterprise network with vulnerable machines, segmentation via VLANs, IDS/IPS inspection, and SIEM logging. The aim is to sharpen blue team skills, test red team tactics, and build practical experience in secure network design and incident response.
-
-## 🛠️ Core Infrastructure
-
-| Component        | Description |
-|------------------|-------------|
-| **Proxmox VE**   | Virtualization platform managing all VMs and networks |
-| **Ubuntu Server**| Docker host running Webgoat, DVWA, and BWAPP via Portainer |
-| **Docker & Portainer** | Containerized vulnerable apps for web exploitation training |
-| **PFsense**      | Firewall/router providing VLAN separation and traffic inspection |
-| **Kali Linux**   | Offensive testing machine for enumeration, scanning, and exploitation |
-| **Metasploitable 2** | Intentionally vulnerable target machine for exploit validation |
-
-### 🔜 Upcoming Additions
-- **Nessus Essentials** – For internal vulnerability scanning and asset enumeration  
-- **Windows Server & Client VMs** – To simulate AD environments, workstation traffic, and lateral movement
-
-## 🔐 Features
-
-- ✅ VLAN-based network segmentation
-- ✅ Web app exploitation targets via Docker
-- ✅ Live firewall traffic analysis via PFsense
-- ✅ Offensive tooling via Kali (Metasploit, Nmap, Burp)
-- ✅ Infrastructure built to support future SIEM/IDS integrations (Splunk, Suricata, Wazuh)
-
-## 📸 Sneak Peek (Add Screenshots Here)
-- Proxmox topology
-- Portainer containers
-- PFsense dashboard
-- Kali in action
-
-## 💡 Learning Objectives
-
-- 🧠 Understand how attacks behave on a segmented network  
-- 🕵️‍♂️ Practice scanning, enumeration, and exploitation  
-- 🛡️ Build and test defensive configurations (IDS, logging, firewall rules)  
-- 📊 Lay the foundation for full SIEM integration (e.g. Splunk or ELK)
-
-## 🔄 Setup (Coming Soon)
-
-Detailed steps for deploying this lab — including network diagrams, setup scripts, and config files — will be added soon.
+This project simulates a realistic enterprise network environment to develop skills in **network segmentation**, **log analysis**, and **security controls implementation**. Built on **Proxmox**, the lab includes multiple operating systems, offensive testing, and centralized log aggregation via Splunk.
 
 ---
 
-> Built by someone who's not just studying cybersecurity — but living it.  
-> _"If it breaks, I learn. If it works, I log it."_  
+## 🔧 Deployment Phases & Stack Overview
+
+### Phase 1 – Network & Perimeter Security
+- **pfSense Firewall**
+  - 🔹 Manages **VLAN segmentation** across multiple subnets
+  - 🔹 Provides **DHCP** to each VLAN (no reliance on Windows)
+  - 🔹 Acts as **internal DNS resolver**
+  - 🔹 Enforces **firewall rules** to simulate restricted zones
+  - 🔹 Logs firewall traffic and events to **Splunk via syslog**
+
+- **Kali Linux**
+  - 🔹 Offensive testing tools: `Nmap`, `Hydra`, `Metasploit`, others
+  - 🔹 Simulates attacker behavior to test detection across the environment
+  - 🔹 Used to generate realistic log events and attack traffic
+
+---
+
+### Phase 2 – Log Aggregation & Visibility
+- **Splunk (Free Tier)**
+  - 🔹 Ingests logs from:
+    - pfSense firewall
+    - Windows Server & Windows 10
+    - Docker containers (optional)
+    - Nessus scans
+  - 🔹 Built custom dashboards and correlation rules
+  - 🔹 Use cases explored:
+    - Port scanning
+    - Failed login attempts
+    - Privilege escalation
+    - Suspicious PowerShell usage
+
+---
+
+### Phase 3 – Vulnerable Targets
+- **Ubuntu Server (Docker Host)**
+  - 🔹 Runs intentionally vulnerable web apps:
+    - `WebGoat`, `DVWA`, `bWAPP`
+  - 🔹 Containerized to practice Docker networking and isolation
+  - 🔹 Used to simulate low-hanging fruit commonly found during assessments
+
+- **Metasploitable 2**
+  - 🔹 Classic vulnerable Linux VM
+  - 🔹 Used to test exploit delivery, lateral movement, and enumeration
+
+- **Nessus Essentials**
+  - 🔹 Internal vulnerability scanning
+  - 🔹 Validates configuration gaps
+  - 🔹 Helps simulate client environment assessment scenarios
+
+---
+
+### Phase 4 – Windows Enterprise Setup
+- **Windows Server 2022**
+  - 🔹 Configured as Active Directory Domain Controller
+  - 🔹 Services enabled:
+    - Domain Services
+    - Group Policy Management (GPO)
+    - DNS (limited to domain lookups)
+  - 🔹 Logs ingested into Splunk:
+    - Logon events
+    - PowerShell usage
+    - Security and system logs
+
+- **Windows 10 Workstation**
+  - 🔹 Domain-joined client machine
+  - 🔹 Simulates user behavior: logins, browsing, file access
+  - 🔹 Used to test internal visibility and endpoint logging
+
+---
+
+## 🧪 Tools & Learning Focus
+
+- **Nmap** – Network scanning and mapping
+- **Hydra** – Brute-force attacks (SSH, RDP, web login)
+- **Metasploit** – Exploit delivery and post-exploitation
+- **Splunk** – Log analysis and detection rule development
+- **pfSense** – Network control, segmentation, and traffic visibility
+- **Windows Event Logs** – Correlating system behavior with real threats
+
+---
+
+## 💡 Why This Lab Exists
+
+This is a practical, self-built lab designed to:
+
+- Build intuition for how systems behave under real-world pressure
+- See how common tools and attacks look in the logs
+- Practice both attacker mindset and defensive architecture
+- Go beyond certification — actually engineer, test, and learn
+
+> Not designed for show — built to sharpen real-world awareness and skill.
