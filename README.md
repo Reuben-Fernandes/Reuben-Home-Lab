@@ -22,7 +22,20 @@ This project simulates a realistic enterprise network environment to develop ski
 
 ---
 
-### Phase 2 – Log Aggregation & Visibility
+### Phase 2 – Vulnerable Targets
+- **Ubuntu Server (Docker Host)**
+  - 🔹 Runs intentionally vulnerable web apps:
+    - `WebGoat`, `DVWA`, `bWAPP`
+  - 🔹 Containerized to practice Docker networking and isolation
+  - 🔹 Used to simulate low-hanging fruit commonly found during assessments
+
+- **Metasploitable 2**
+  - 🔹 Classic vulnerable Linux VM
+  - 🔹 Used to test exploit delivery, lateral movement, and enumeration
+
+---
+
+### Phase 3 – Log Aggregation & Visibility
 - **Splunk (Free Tier)**
   - 🔹 Ingests logs from:
     - pfSense firewall
@@ -35,20 +48,7 @@ This project simulates a realistic enterprise network environment to develop ski
     - Failed login attempts
     - Privilege escalation
     - Suspicious PowerShell usage
-
----
-
-### Phase 3 – Vulnerable Targets
-- **Ubuntu Server (Docker Host)**
-  - 🔹 Runs intentionally vulnerable web apps:
-    - `WebGoat`, `DVWA`, `bWAPP`
-  - 🔹 Containerized to practice Docker networking and isolation
-  - 🔹 Used to simulate low-hanging fruit commonly found during assessments
-
-- **Metasploitable 2**
-  - 🔹 Classic vulnerable Linux VM
-  - 🔹 Used to test exploit delivery, lateral movement, and enumeration
-
+      
 - **Nessus Essentials**
   - 🔹 Internal vulnerability scanning
   - 🔹 Validates configuration gaps
