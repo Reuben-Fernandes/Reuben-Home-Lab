@@ -12,7 +12,7 @@ This project simulates a realistic enterprise network environment to develop ski
   - 🔹 Provides **DHCP** to each VLAN (no reliance on Windows)
   - 🔹 Acts as **internal DNS resolver**
   - 🔹 Enforces **firewall rules** to simulate restricted zones
-  - 🔹 Logs firewall traffic and events to **Splunk via syslog**
+  - 🔹 Logs firewall traffic and events to **Splunk via Syslog**
 
 - **Kali Linux**
   - 🔹 Offensive testing tools: `Nmap`, `Hydra`, `Metasploit`, others
