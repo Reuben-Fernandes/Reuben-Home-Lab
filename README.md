@@ -6,6 +6,7 @@ This project simulates a realistic enterprise network environment to develop ski
 
 ## 🔧 Deployment Phases & Stack Overview
 
+📘 [Phase 1 – Network & Perimeter Setup Guide](./phase-1-network.md)
 ### Phase 1 – Network & Perimeter Security
 - **pfSense Firewall**
   - 🔹 Manages **VLAN segmentation** across multiple subnets
