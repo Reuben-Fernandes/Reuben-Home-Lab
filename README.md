@@ -23,6 +23,7 @@ This project simulates a realistic enterprise network environment to develop ski
 ---
 
 ### Phase 2 – Vulnerable Targets
+📘 [Phase 2 – Vulnerable Targets Setup Guide](./phase-2-vulnerable-targets.md)
 - **Ubuntu Server (Docker Host)**
   - 🔹 Runs intentionally vulnerable web apps:
     - `WebGoat`, `DVWA`, `bWAPP`
