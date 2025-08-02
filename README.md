@@ -37,6 +37,7 @@ This project simulates a realistic enterprise network environment to develop ski
 ---
 
 ### Phase 3 – Log Aggregation & Visibility
+📘 [Phase 3 – Network & Perimeter Setup Guide](./phase-3-log-aggregation-and-visibility.md)
 - **Splunk (Free Tier)**
   - 🔹 Ingests logs from:
     - pfSense firewall
