@@ -94,4 +94,24 @@ This is a practical, self-built lab designed to:
 - Practice both attacker mindset and defensive architecture
 - Go beyond certification — actually engineer, test, and learn
 
-> Not designed for show — built to sharpen real-world awareness and skill.
+> Built to sharpen real-world awareness and skill.
+
+```mermaid
+graph TD
+  Internet --> pfSense
+  pfSense --> VLAN1[VLAN 1: 10.10.1.0/24]
+  pfSense --> VLAN10[VLAN 10: 10.10.10.0/24]
+  pfSense --> VLAN20[VLAN 20: 10.10.20.0/24]
+  pfSense --> VLAN30[VLAN 30: 10.10.30.0/24]
+
+  VLAN1 --> Kali(Kali: .50)
+  VLAN1 --> Splunk(Splunk: .51)
+  VLAN1 --> Nessus(Nessus: .53)
+
+  VLAN10 --> Metasploit(Metasploit: .50)
+
+  VLAN30 --> Ubuntu(Host: .50)
+  Ubuntu --> DVWA
+  Ubuntu --> bWAPP
+  Ubuntu --> WebGoat
+
