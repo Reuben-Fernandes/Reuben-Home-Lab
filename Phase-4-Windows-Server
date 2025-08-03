@@ -1,137 +1,87 @@
-# Phase 4 – Windows Server Deployment  
-Lab Domain Controller with DNS, DHCP, and Active Directory
+### Phase 4 – Windows Server Deployment
+
+#### 🔥 Goal
+Deploy a Windows Server as Domain Controller to manage **DHCP**, **DNS**, and user authentication across the lab.
 
 ---
 
-### 🎯 Purpose
+#### 🧱 Components
 
-Introduce a real Windows Server into the homelab for domain services, network control, and user provisioning.
-
----
-
-### ⚙️ Specs
-
-| Component     | Details                                |
-|---------------|----------------------------------------|
-| OS            | Windows Server 2022 Eval               |
-| CPU           | 2 vCPUs                                |
-| RAM           | 4 GB (6 GB recommended)                |
-| Disk          | 45 GB                                  |
-| Network       | VLAN 20                                |
-| Roles         | AD DS, DNS, DHCP Server                |
-
----
-
-### 🧱 Setup Overview
-
-1. Download ISOs:
-   - [Windows Server Eval](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022)
-   - [VirtIO Drivers](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/)
-
-2. Create VM in Proxmox:
-   - CPU: 2 cores
-   - RAM: 4 GB
-   - Disk: 45 GB (VirtIO/SCSI)
-   - Mount both ISOs (Server + VirtIO)
-
-3. Install Server:
-   - Load VirtIO drivers from `/viostor/w10/amd64/`
-   - Select Desktop Experience
-   - Set admin password
-
----
-
-### 🔧 Post-Install Configuration
-
-- Rename host to: `WIN-SRV-DC01`
-- Set static IP: `10.10.20.10`
-- Install updates
-- Install **VirtIO Guest Tools**
-
----
-
-### 🏗️ Roles & Services
-
-- Installed via **Server Manager**:
-  - DNS Server
-  - DHCP Server
-  - Active Directory Domain Services
-
-- Promoted to Domain Controller:
-  - Forest: `reuben.local`
-  - Function Level: Server 2016
-  - Rebooted after install
-
----
-
-### 🌐 Network Configuration
-
-- **DHCP Scope Created in Windows**:
-  - Scope Name: `VLAN 20`
-  - IP Range: `10.10.20.100 – 10.10.20.120`
+- **Windows Server 2022 (Eval)**
+  - Acts as **Domain Controller**, **DHCP**, and **DNS**
+  - Domain: `reuben.local`
+  - Promoted via Server Manager with Forest functional level: Server 2016
+  - Static IP: `10.10.20.10` (VLAN 20)
+  - DHCP Scope: `10.10.20.100 – 10.10.20.120`
   - Gateway: `10.10.20.254`
-  - Scope activated
 
-- **DHCP Disabled in pfSense** (VLAN 20):
-  - `Services > DHCP Server > VLAN 20 → Disabled`
-
----
-
-### 👥 User Provisioning via PowerShell
-
-Manually created:
-- `Reuben Fernandes` – Standard
-- `RF Admin` – Domain Admin
-
-Bulk-created 7 lab users via PowerShell into `OU=Users,DC=reuben,DC=local`:
-
-<details>
-<summary>Click to expand PowerShell script</summary>
-
-```powershell
-Import-Module ActiveDirectory
-
-$users = @(
-    @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"},
-    @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"},
-    @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"},
-    @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"},
-    @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"},
-    @{Name="George Hall"; Username="ghall"; Password="G£eorge55"},
-    @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"}
-)
-
-$OU = "OU=Users,DC=reuben,DC=local"
-$domain = "reuben.local"
-
-foreach ($user in $users) {
-    $securePass = ConvertTo-SecureString $user.Password -AsPlainText -Force
-
-    New-ADUser `
-        -Name $user.Name `
-        -GivenName ($user.Name.Split(' ')[0]) `
-        -Surname ($user.Name.Split(' ')[-1]) `
-        -SamAccountName $user.Username `
-        -UserPrincipalName "$($user.Username)@$domain" `
-        -AccountPassword $securePass `
-        -Path $OU `
-        -Enabled $true `
-        -ChangePasswordAtLogon $false `
-        -PasswordNeverExpires $true
-
-    Write-Host "Created user: $($user.Username)"
-}
-```
-
-</details>
+- **Active Directory Users**
+  - `Reuben Fernandes` – normal privileges
+  - `RF Admin` – Domain Admins group
+  - Bulk users created with PowerShell script into `OU=Users,DC=reuben,DC=local`:
+    - Alice Doe
+    - Bob Smith
+    - Daisy Johnson
+    - Evan Lee
+    - Fiona Clark
+    - George Hall
+    - Hannah Lewis
 
 ---
 
-### ✅ Result
+#### ⚙️ Specs
 
-Windows Server now acts as the primary Domain Controller with AD, DHCP, and DNS. The lab is ready for:
+| Component | Details                      |
+|-----------|------------------------------|
+| OS        | Windows Server 2022 Eval     |
+| CPU       | 2 vCPUs                      |
+| RAM       | 4 GB (6 GB recommended)      |
+| Disk      | 45 GB                        |
+| Network   | VLAN 20                      |
 
-- Client VM joins
-- GPO testing
-- Log forwarding (Phase 5)
+---
 
+#### 🛠️ Setup Steps
+
+1. **Download Windows Server ISO**
+   - From official Microsoft Eval center
+   - Also download Proxmox VirtIO ISO for driver support
+
+2. **Create VM in Proxmox**
+   - Attach both ISOs
+   - Use 2 vCPUs, 4 GB RAM, 45 GB disk
+
+3. **Install VirtIO Drivers During Setup**
+   - Load driver to detect disk
+   - Proceed with OS install
+
+4. **Initial Configuration**
+   - Set static IP: `10.10.20.10`
+   - Rename machine to `WS-DC01`
+   - Join internal lab network
+
+5. **Disable pfSense DHCP on VLAN 20**
+   - Done via pfSense web UI
+
+6. **Install DHCP & DNS Roles**
+   - Open Server Manager → Add Roles & Features
+   - Add DHCP and DNS
+   - Restart server
+
+7. **Promote to Domain Controller**
+   - Create Forest: `reuben.local`
+   - Set forest/domain level to Server 2016
+
+8. **Configure DHCP Scope**
+   - Scope Name: `VLAN 20`
+   - Range: `10.10.20.100 – 10.10.20.120`
+   - Gateway: `10.10.20.254`
+   - Activate Scope
+
+9. **Bulk Create AD Users**
+   - Used custom PowerShell script to populate lab with test users
+   - All users added to appropriate OU with preset passwords and settings
+
+---
+
+> 🧪 Validate: Ensure other machines on VLAN 20 receive IPs via the Windows DHCP server and can resolve DNS through it. Test domain join and authentication for one client (e.g. Windows 10 or Ubuntu).
