@@ -1,108 +1,109 @@
-# Phase 4 – Windows Server Deployment (Lab Domain Controller)
-
-### 📚 Purpose
-Introduce a real Windows Server into the homelab environment for Active Directory, DNS, DHCP, and eventual attacker simulation.
+# Phase 4 – Windows Server Deployment  
+Lab Domain Controller with DNS, DHCP, and Active Directory
 
 ---
 
-### 🛠️ Environment Specs
+### 🎯 Purpose
 
-| Component     | Value                                  |
+Introduce a real Windows Server into the homelab for domain services, network control, and user provisioning.
+
+---
+
+### ⚙️ Specs
+
+| Component     | Details                                |
 |---------------|----------------------------------------|
-| **OS**        | Windows Server 2022 Eval               |
-| **CPU**       | 2 vCPUs                                |
-| **RAM**       | 4 GB (6 GB recommended)                |
-| **Disk**      | 45 GB                                  |
-| **Networking**| VLAN 1 or isolated VLAN                |
-| **Roles**     | AD DS, DNS, DHCP Server                |
+| OS            | Windows Server 2022 Eval               |
+| CPU           | 2 vCPUs                                |
+| RAM           | 4 GB (6 GB recommended)                |
+| Disk          | 45 GB                                  |
+| Network       | VLAN 20                                |
+| Roles         | AD DS, DNS, DHCP Server                |
 
 ---
 
-### ✅ Step-by-Step Installation
+### 🧱 Setup Overview
 
-#### ✉️ Step 1: Download Required ISOs
+1. Download ISOs:
+   - [Windows Server Eval](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022)
+   - [VirtIO Drivers](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/)
 
-- **Windows Server 2022 Evaluation**  
-  👉 https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022
+2. Create VM in Proxmox:
+   - CPU: 2 cores
+   - RAM: 4 GB
+   - Disk: 45 GB (VirtIO/SCSI)
+   - Mount both ISOs (Server + VirtIO)
 
-- **VirtIO ISO for Proxmox Drivers**  
-  👉 https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/
-
----
-
-#### 📁 Step 2: Create the VM in Proxmox
-
-- **Create new VM**
-  - Name: `WIN-SRV-DC01`
-  - OS Type: Microsoft Windows
-
-- **Mount ISOs**
-  - CD-ROM 1: Windows Server ISO
-  - CD-ROM 2: VirtIO Drivers ISO
-
-- **VM Settings**
-  - CPU: 2 cores
-  - RAM: 4096 MB (6144 MB optional)
-  - Disk: 45 GB (VirtIO/SCSI)
-  - Network: VirtIO adapter
-
----
-
-#### 🌐 Step 3: Install Windows Server
-
-1. Boot into the Windows Server ISO  
-2. At the disk screen, load drivers from VirtIO ISO:  
-   - Path: `/viostor/w10/amd64/`  
-3. Proceed with install:
-   - Choose "Desktop Experience"
+3. Install Server:
+   - Load VirtIO drivers from `/viostor/w10/amd64/`
+   - Select Desktop Experience
    - Set admin password
 
 ---
 
-#### 🧲 Step 4: Post-Install Tasks
+### 🔧 Post-Install Configuration
 
-- **Created AD Accounts**:
-  - `Reuben Fernandes` (standard privileges)
-  - `RF Admin` (added to Domain Admins group)
+- Rename host to: `WIN-SRV-DC01`
+- Set static IP: `10.10.20.10`
+- Install updates
+- Install **VirtIO Guest Tools**
 
-- **Disabled DHCP on VLAN 20 in pfSense**:
-  - Location: `Services > DHCP Server > VLAN 20`
-  - Action: DHCP disabled to prevent conflicts
+---
 
-- **Configured DHCP in Windows Server**:
-  - **Scope Name**: `VLAN 20`
-  - **IP Range**: `10.10.20.100 – 10.10.20.120`
-  - **Default Gateway**: `10.10.20.254`
-  - **Status**: Scope successfully activated
+### 🏗️ Roles & Services
 
-- **Populated Active Directory with Test Users** (via PowerShell):
-  - Users: Alice Doe, Bob Smith, Daisy Johnson, Evan Lee, Fiona Clark, George Hall, Hannah Lewis
-  - OU Target: `OU=Users,DC=reuben,DC=local`
-  - Bulk user creation used secure passwords and `PasswordNeverExpires = true`
+- Installed via **Server Manager**:
+  - DNS Server
+  - DHCP Server
+  - Active Directory Domain Services
+
+- Promoted to Domain Controller:
+  - Forest: `reuben.local`
+  - Function Level: Server 2016
+  - Rebooted after install
+
+---
+
+### 🌐 Network Configuration
+
+- **DHCP Scope Created in Windows**:
+  - Scope Name: `VLAN 20`
+  - IP Range: `10.10.20.100 – 10.10.20.120`
+  - Gateway: `10.10.20.254`
+  - Scope activated
+
+- **DHCP Disabled in pfSense** (VLAN 20):
+  - `Services > DHCP Server > VLAN 20 → Disabled`
+
+---
+
+### 👥 User Provisioning via PowerShell
+
+Manually created:
+- `Reuben Fernandes` – Standard
+- `RF Admin` – Domain Admin
+
+Bulk-created 7 lab users via PowerShell into `OU=Users,DC=reuben,DC=local`:
 
 <details>
-<summary>🖥️ PowerShell Script</summary>
+<summary>Click to expand PowerShell script</summary>
 
 ```powershell
-# Import Active Directory module
 Import-Module ActiveDirectory
 
-# User array (excluding manually created users)
 $users = @(
-    @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"; Role="Test User"},
-    @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"; Role="Test User"},
-    @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"; Role="Test User"},
-    @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"; Role="Test User"},
-    @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"; Role="Test User"},
-    @{Name="George Hall"; Username="ghall"; Password="G£eorge55"; Role="Test User"},
-    @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"; Role="Test User"}
+    @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"},
+    @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"},
+    @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"},
+    @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"},
+    @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"},
+    @{Name="George Hall"; Username="ghall"; Password="G£eorge55"},
+    @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"}
 )
 
-# Modify these to match your lab environment
 $OU = "OU=Users,DC=reuben,DC=local"
 $domain = "reuben.local"
 
-# Bulk user creation loop
 foreach ($user in $users) {
     $securePass = ConvertTo-SecureString $user.Password -AsPlainText -Force
 
@@ -121,8 +122,16 @@ foreach ($user in $users) {
     Write-Host "Created user: $($user.Username)"
 }
 ```
+
 </details>
 
 ---
 
-> ✅ At this stage, Windows Server is now a functioning Domain Controller with DNS, DHCP, and user accounts provisioned. The environment is ready for client joins, Group Policy testing, and log forwarding configuration in the next phase.
+### ✅ Result
+
+Windows Server now acts as the primary Domain Controller with AD, DHCP, and DNS. The lab is ready for:
+
+- Client VM joins
+- GPO testing
+- Log forwarding (Phase 5)
+
