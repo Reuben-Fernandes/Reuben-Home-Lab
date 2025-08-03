@@ -59,6 +59,7 @@ This project simulates a realistic enterprise network environment to develop ski
 ---
 
 ### Phase 4 – Windows Enterprise Setup
+- [Phase 4 – Windows-Setup-And-Services-setup](phase4-WindowsServ-AD.md)
 - **Windows Server 2022**
   - 🔹 Configured as Active Directory Domain Controller
   - 🔹 Services enabled:
