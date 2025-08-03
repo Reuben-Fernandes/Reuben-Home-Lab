@@ -1,93 +1,84 @@
-### Phase 4 – Windows Server Deployment
+### Phase 4 – Windows Server & Domain Infrastructure
 
-#### 🔥 Goal
-Deploy a Windows Server as Domain Controller to manage **DHCP**, **DNS**, and user authentication across the lab.
+#### 🔥 Goal  
+Deploy Active Directory, DHCP, DNS, and integrate Windows systems into a working domain with log forwarding for identity monitoring.
 
 ---
 
 #### 🧱 Components
 
-- **Windows Server 2022 Eval**
-  - Connected to VLAN 20 (`10.10.20.0/24`)
+- **Windows Server 2022**
+  - Role: Domain Controller, DHCP, DNS
+  - Hostname: `REUBEN-DC`
   - Static IP: `10.10.20.10`
-  - Renamed host to `WIN-DC01`
-  - Installed roles:
-    - **DHCP Server**
-    - **DNS Server**
-    - **Active Directory Domain Services (ADDS)**
-  - Promoted to Domain Controller:
-    - Forest: `reuben.local`
-    - Functional level: Server 2016
+  - Subnet: `VLAN 20` (`10.10.20.0/24`)
 
-- **DHCP (VLAN 20)**
-  - Scope Name: `VLAN 20`
-  - Range: `10.10.20.100 – 10.10.20.120`
-  - Gateway: `10.10.20.254`
-  - Replaced pfSense DHCP on this VLAN
+- **Windows 11 Pro**
+  - Joined to domain `reuben.local`
+  - IP via DHCP from Windows Server
+  - Used for testing logon events and domain connectivity
 
-- **AD Users**
-  - Manually created:
-    - `Reuben Fernandes` (Standard)
-    - `RF Admin` (Domain Admin)
-  - Bulk created via PowerShell (7 test users)
+- **Splunk Universal Forwarder (Windows)**
+  - Installed on Domain Controller
+  - Logs forwarded to Splunk Indexer (Ubuntu) on port `9997`
+  - Custom Index: `win`
+  - **Only Security logs enabled for now**
 
 ---
 
 #### ⚙️ Setup Steps
 
-1. **Install Windows Server**
-   - Download Eval ISO from Microsoft
-   - Create VM in Proxmox:
-     - 2 vCPUs, 4–6 GB RAM, 45 GB Disk
-   - Use VirtIO ISO to load drivers
+1. **Install Windows Server 2022**
+   - Used official Microsoft Eval ISO
+   - Added Proxmox VirtIO driver ISO during setup
+   - Specs: 45GB HDD, 2 vCPU, 4GB RAM
 
-2. **Initial Configuration**
+2. **Configure Windows Server**
+   - Renamed host to `REUBEN-DC`
    - Set static IP: `10.10.20.10`
-   - Rename computer: `WIN-DC01`
-   - Disable pfSense DHCP on VLAN 20
+   - Installed roles:
+     - **Active Directory Domain Services (AD DS)**
+     - **DNS**
+     - **DHCP Server**
+   - Promoted to Domain Controller:
+     - Forest/domain: `reuben.local`
+     - Forest level: Windows Server 2016
+   - Rebooted to complete setup
 
-3. **Install Server Roles**
-   - Add via Server Manager:
-     - DHCP
-     - DNS
-     - Active Directory Domain Services
-   - Restart system
+3. **Configure DHCP (Windows)**
+   - Disabled pfSense DHCP on VLAN 20
+   - Created DHCP Scope:
+     - Name: `VLAN 20`
+     - IP Range: `10.10.20.100 – 10.10.20.120`
+     - Gateway: `10.10.20.254`
+   - Scope activated via DHCP Manager
 
-4. **Promote to Domain Controller**
-   - Launch ADDS wizard
-   - Create new forest: `reuben.local`
-   - Functional level: Server 2016
-   - Complete setup and restart
+4. **Install and Join Windows 11 Pro**
+   - Clean VM install with DHCP assigned IP
+   - Joined to domain `reuben.local`
+   - Validated domain logon with user accounts
 
-5. **Configure DHCP**
-   - Create scope: `VLAN 20`
-   - IP Range: `10.10.20.100 – 10.10.20.120`
-   - Set router: `10.10.20.254`
-   - Activate the scope
-
-6. **Add AD Users**
-   - Manually add `Reuben Fernandes` and `RF Admin`
-   - Use the following PowerShell script to bulk-create lab users:
+5. **Create AD Users**
+   - Manual:
+     - `Reuben Fernandes` – Standard
+     - `RF Admin` – Domain Admin
+   - Scripted (via PowerShell):
      ```powershell
-     # Import Active Directory module
      Import-Module ActiveDirectory
 
-     # User array (excluding Reuben Fernandes and RF Admin)
      $users = @(
-         @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"; Role="Test User"},
-         @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"; Role="Test User"},
-         @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"; Role="Test User"},
-         @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"; Role="Test User"},
-         @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"; Role="Test User"},
-         @{Name="George Hall"; Username="ghall"; Password="G£eorge55"; Role="Test User"},
-         @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"; Role="Test User"}
+         @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"},
+         @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"},
+         @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"},
+         @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"},
+         @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"},
+         @{Name="George Hall"; Username="ghall"; Password="G£eorge55"},
+         @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"}
      )
 
-     # Target container
      $OU = "CN=Users,DC=reuben,DC=local"
      $domain = "reuben.local"
 
-     # Loop to create users
      foreach ($user in $users) {
          $securePass = ConvertTo-SecureString $user.Password -AsPlainText -Force
 
@@ -107,13 +98,18 @@ Deploy a Windows Server as Domain Controller to manage **DHCP**, **DNS**, and us
      }
      ```
 
-7. **Install Splunk Universal Forwarder**
-   - Download MSI installer using:
-     ```
-     https://download.splunk.com/products/universalforwarder/releases/10.0.0/windows/splunkforwarder-10.0.0-e8eb0c4654f8-windows-x64.msi"
-     ```
-   - Install and configure to forward logs to Splunk indexer (`10.10.1.51`, port `9997`)
+6. **Install Splunk Universal Forwarder**
+   - Downloaded the `.msi` installer from [Splunk’s official downloads page](https://www.splunk.com/en_us/download/universal-forwarder.html)  
+   - _Direct link removed to not unintentionally go against Splunk TOS_
+   - Installed using GUI (Next > Next > etc.)
+   - Configured during setup:
+     - Indexer: `10.10.1.51` (Ubuntu Splunk)
+     - Port: `9997`
+     - Index: `win`
+     - Monitored Logs:
+       - **Application**
+       - **Security**
+       - **Setup**
+       - **System**
+       - **Forwarded Events**
 
----
-
-> 🔍 Validate: Ensure DHCP leases from VLAN 20 are issued by the Windows Server. Confirm test users can authenticate in the domain `reuben.local`. Verify Splunk forwarder is phoning home successfully.
