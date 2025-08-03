@@ -67,25 +67,43 @@ Deploy a Windows Server as Domain Controller to manage **DHCP**, **DNS**, and us
 
 6. **Add AD Users**
    - Manually add `Reuben Fernandes` and `RF Admin`
-   - Use this PowerShell script to add 7 more users:
+   - Use the following PowerShell script to bulk-create lab users:
      ```powershell
+     # Import Active Directory module
      Import-Module ActiveDirectory
+
+     # User array (excluding Reuben Fernandes and RF Admin)
      $users = @(
-       @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"},
-       @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"},
-       @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"},
-       @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"},
-       @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"},
-       @{Name="George Hall"; Username="ghall"; Password="G£eorge55"},
-       @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"}
+         @{Name="Alice Doe"; Username="adoe"; Password="A1ice@Lab"; Role="Test User"},
+         @{Name="Bob Smith"; Username="bsmith"; Password="B0b@Lab23"; Role="Test User"},
+         @{Name="Daisy Johnson"; Username="djohnson"; Password="D@1syL@b"; Role="Test User"},
+         @{Name="Evan Lee"; Username="elee"; Password="E!vanLab3"; Role="Test User"},
+         @{Name="Fiona Clark"; Username="fclark"; Password="F1ona@Lab"; Role="Test User"},
+         @{Name="George Hall"; Username="ghall"; Password="G£eorge55"; Role="Test User"},
+         @{Name="Hannah Lewis"; Username="hlewis"; Password="H@nnah89"; Role="Test User"}
      )
-     $OU = "OU=Users,DC=reuben,DC=local"
+
+     # Target container
+     $OU = "CN=Users,DC=reuben,DC=local"
+     $domain = "reuben.local"
+
+     # Loop to create users
      foreach ($user in $users) {
-       $pass = ConvertTo-SecureString $user.Password -AsPlainText -Force
-       New-ADUser -Name $user.Name -SamAccountName $user.Username `
-         -UserPrincipalName "$($user.Username)@reuben.local" `
-         -Path $OU -AccountPassword $pass -Enabled $true `
-         -PasswordNeverExpires $true -ChangePasswordAtLogon $false
+         $securePass = ConvertTo-SecureString $user.Password -AsPlainText -Force
+
+         New-ADUser `
+             -Name $user.Name `
+             -GivenName ($user.Name.Split(' ')[0]) `
+             -Surname ($user.Name.Split(' ')[-1]) `
+             -SamAccountName $user.Username `
+             -UserPrincipalName "$($user.Username)@$domain" `
+             -AccountPassword $securePass `
+             -Path $OU `
+             -Enabled $true `
+             -ChangePasswordAtLogon $false `
+             -PasswordNeverExpires $true
+
+         Write-Host "✅ Created user:" $user.Username
      }
      ```
 
