@@ -109,8 +109,8 @@ Deploy a Windows Server as Domain Controller to manage **DHCP**, **DNS**, and us
 
 7. **Install Splunk Universal Forwarder**
    - Download MSI installer using:
-     ```powershell
-     wget -O splunkforwarder-10.0.0-e8eb0c4654f8-windows-x64.msi "https://download.splunk.com/products/universalforwarder/releases/10.0.0/windows/splunkforwarder-10.0.0-e8eb0c4654f8-windows-x64.msi"
+     ```
+     https://download.splunk.com/products/universalforwarder/releases/10.0.0/windows/splunkforwarder-10.0.0-e8eb0c4654f8-windows-x64.msi"
      ```
    - Install and configure to forward logs to Splunk indexer (`10.10.1.51`, port `9997`)
 
