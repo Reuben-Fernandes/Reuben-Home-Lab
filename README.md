@@ -4,13 +4,43 @@ This project simulates a realistic enterprise network environment to develop ski
 
 ---
 
+## 🌐 Network Topology
+
+```mermaid
+graph TD
+  Internet --> pfSense
+  pfSense --> VLAN1[VLAN 1: 10.10.1.0/24]
+  pfSense --> VLAN10[VLAN 10: 10.10.10.0/24]
+  pfSense --> VLAN20[VLAN 20: 10.10.20.0/24]
+  pfSense --> VLAN30[VLAN 30: 10.10.30.0/24]
+
+  VLAN1 --> Kali(Kali: .50)
+  VLAN1 --> Splunk(Splunk: .51)
+  VLAN1 --> Nessus(Nessus: .53)
+
+  VLAN10 --> Metasploit(Metasploit: .50)
+
+  VLAN20 --> WinServer(Windows Server 2022: .51)
+  VLAN20 --> Win11(Windows 11 Workstation: .52)
+
+  VLAN30 --> Ubuntu(Host: .50)
+  Ubuntu --> DVWA
+  Ubuntu --> bWAPP
+  Ubuntu --> WebGoat
+```
+
+---
+
 ## 🔧 Deployment Phases & Stack Overview
 
-### Phase 1 – Network & Perimeter Security
+---
+
+### Phase 1 – Network & Perimeter Security  
 📘 [Phase 1 – Network & Perimeter Setup Guide](./phase-1-network.md)
+
 - **pfSense Firewall**
   - 🔹 Manages **VLAN segmentation** across multiple subnets
-  - 🔹 Provides **DHCP** to each VLAN (no reliance on Windows for VLANs outside VLAN20)
+  - 🔹 Provides **DHCP** to each VLAN (no reliance on Windows for VLANs outside VLAN 20)
   - 🔹 Acts as **internal DNS resolver**
   - 🔹 Enforces **firewall rules** to simulate restricted zones
   - 🔹 Logs firewall traffic and events to **Splunk via Syslog**
@@ -22,8 +52,9 @@ This project simulates a realistic enterprise network environment to develop ski
 
 ---
 
-### Phase 2 – Vulnerable Targets
+### Phase 2 – Vulnerable Targets  
 📘 [Phase 2 – Vulnerable Targets Setup Guide](./phase-2-vulnerable-targets.md)
+
 - **Ubuntu Server (Docker Host)**
   - 🔹 Runs intentionally vulnerable web apps:
     - `WebGoat`, `DVWA`, `bWAPP`
@@ -36,21 +67,22 @@ This project simulates a realistic enterprise network environment to develop ski
 
 ---
 
-### Phase 3 – Log Aggregation & Visibility
-- [Phase 3 – Log Aggregation & Visibility](phase-3-splunk-visibility.md)
+### Phase 3 – Log Aggregation & Visibility  
+📘 [Phase 3 – Log Aggregation & Visibility](./phase-3-splunk-visibility.md)
+
 - **Splunk (Free Tier)**
   - 🔹 Ingests logs from:
-    - pfSense firewall
-    - Windows Server & Windows 10
-    - Docker containers (optional)
-    - Nessus scans
-  - 🔹 Built custom dashboards and correlation rules
+    - pfSense firewall (via Syslog)
+    - Ubuntu (via Universal Forwarder)
+    - Nessus scan events
+    - Windows Server & Windows 11 Workstation (via Universal Forwarder)
+  - 🔹 Indexes created: `pf`, `nessus`, `win`, `infra`
   - 🔹 Use cases explored:
     - Port scanning
     - Failed login attempts
     - Privilege escalation
     - Suspicious PowerShell usage
-      
+
 - **Nessus Essentials**
   - 🔹 Internal vulnerability scanning
   - 🔹 Validates configuration gaps
@@ -58,23 +90,21 @@ This project simulates a realistic enterprise network environment to develop ski
 
 ---
 
-### Phase 4 – Windows Enterprise Setup
-- [Phase 4 – Windows-Setup-And-Services-setup](phase4-WindowsServ-AD.md)
-- **Windows Server 2022**
-  - 🔹 Configured as Active Directory Domain Controller
-  - 🔹 Services enabled:
-    - Domain Services
-    - Group Policy Management (GPO)
-    - DNS (limited to domain lookups)
-  - 🔹 Logs ingested into Splunk:
-    - Logon events
-    - PowerShell usage
-    - Security and system logs
+### Phase 4 – Windows Enterprise Setup  
+📘 [Phase 4 – Windows Setup & Services Guide](./phase4-WindowsServ-AD.md)
 
-- **Windows 10 Workstation**
-  - 🔹 Domain-joined client machine
-  - 🔹 Simulates user behavior: logins, browsing, file access
-  - 🔹 Used to test internal visibility and endpoint logging
+- **Windows Server 2022**
+  - 🔹 Configured as Domain Controller (`reuben.local`)
+  - 🔹 Services enabled: AD, DNS, DHCP (for VLAN 20)
+  - 🔹 DHCP range: `10.10.20.100 – .120`
+  - 🔹 Users added via PowerShell (bulk and admin accounts)
+  - 🔹 Splunk Universal Forwarder installed (logs: Security, System, Application, etc.)
+
+- **Windows 11 Workstation**
+  - 🔹 DHCP from Windows Server
+  - 🔹 Domain-joined
+  - 🔹 Logged in as standard domain user
+  - 🔹 Splunk Forwarder mirrors log setup
 
 ---
 
@@ -99,23 +129,3 @@ This is a practical, self-built lab designed to:
 - Go beyond certification — actually engineer, test, and learn
 
 > Built to sharpen real-world awareness and skill.
-
-```mermaid
-graph TD
-  Internet --> pfSense
-  pfSense --> VLAN1[VLAN 1: 10.10.1.0/24]
-  pfSense --> VLAN10[VLAN 10: 10.10.10.0/24]
-  pfSense --> VLAN20[VLAN 20: 10.10.20.0/24]
-  pfSense --> VLAN30[VLAN 30: 10.10.30.0/24]
-
-  VLAN1 --> Kali(Kali: .50)
-  VLAN1 --> Splunk(Splunk: .51)
-  VLAN1 --> Nessus(Nessus: .53)
-
-  VLAN10 --> Metasploit(Metasploit: .50)
-
-  VLAN30 --> Ubuntu(Host: .50)
-  Ubuntu --> DVWA
-  Ubuntu --> bWAPP
-  Ubuntu --> WebGoat
-
