@@ -10,7 +10,7 @@ This project simulates a realistic enterprise network environment to develop ski
 📘 [Phase 1 – Network & Perimeter Setup Guide](./phase-1-network.md)
 - **pfSense Firewall**
   - 🔹 Manages **VLAN segmentation** across multiple subnets
-  - 🔹 Provides **DHCP** to each VLAN (no reliance on Windows)
+  - 🔹 Provides **DHCP** to each VLAN (no reliance on Windows for VLANs outside VLAN20)
   - 🔹 Acts as **internal DNS resolver**
   - 🔹 Enforces **firewall rules** to simulate restricted zones
   - 🔹 Logs firewall traffic and events to **Splunk via Syslog**
