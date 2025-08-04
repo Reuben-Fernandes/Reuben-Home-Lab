@@ -116,9 +116,6 @@ This phase focuses on implementing core blue-team controls across your homelab. 
 ### 🔒 Firewall Rules & Network Segmentation
 
 - Configure **PFsense** rules per VLAN
-  - Block inter-VLAN traffic unless explicitly required
-  - Restrict outbound access from lab machines (e.g., Win11, Kali)
-  - Simulate realistic policies (e.g., allow HTTP, block ICMP)
 - Validate using test commands (e.g., ping from Kali to Win11)
 - Document expected behavior vs observed
 
