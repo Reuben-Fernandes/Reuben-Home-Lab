@@ -105,6 +105,60 @@ graph TD
   - 🔹 Domain-joined
   - 🔹 Logged in as standard domain user
   - 🔹 Splunk Forwarder mirrors log setup
+---
+
+## 🛡️ Phase 5 – Security Hardening & Detection Layer
+
+This phase focuses on implementing core blue-team controls across your homelab. Now that logging and visibility are in place, it's time to simulate threat surfaces, segment traffic, and lay the foundation for detection.
+
+---
+
+### 🔒 Firewall Rules & Network Segmentation
+
+- Configure **PFsense** rules per VLAN
+  - Block inter-VLAN traffic unless explicitly required
+  - Restrict outbound access from lab machines (e.g., Win11, Kali)
+  - Simulate realistic policies (e.g., allow HTTP, block ICMP)
+- Validate using test commands (e.g., ping from Kali to Win11)
+- Document expected behavior vs observed
+
+---
+
+### 🐍 Nessus Vulnerability Scanning
+
+- Deploy **Nessus Essentials** on Kali or dedicated VM
+- Run scans against:
+  - Windows Server (AD/DC)
+  - Windows 11 endpoint
+  - Metasploitable
+  - Docker services
+- Export and save vulnerability reports
+- Tag notable findings for Splunk ingestion or alerting
+
+---
+
+### 🧠 Intrusion Detection – Suricata or Snort
+
+- Deploy Suricata (on its own VM or inline with PFsense)
+- Load default rule set (ET Open or similar)
+- Trigger alerts via simulated attacks from Kali
+- Confirm logs are forwarded to Splunk for visibility
+
+---
+
+### 🪵 Log Enrichment & Alert Testing
+
+- Ensure logs from:
+  - PFsense firewall blocks
+  - Nessus scan results
+  - Suricata alerts (if deployed)
+- Are being ingested into **Splunk**
+- Sample SPL Queries:
+  ```spl
+  index=firewall action=blocked
+  index=nessus severity=high
+  index=suricata alert.signature=*
+
 
 ---
 
