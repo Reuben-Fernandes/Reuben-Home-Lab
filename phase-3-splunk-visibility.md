@@ -40,6 +40,7 @@ Centralize logs from critical systems (pfSense, Ubuntu) into **Splunk Free Tier*
 
 2. **Download & Install `.deb`**
    - From [splunk.com](https://www.splunk.com/en_us/download.html) after login
+   - wget -O splunk-10.0.0-e8eb0c4654f8-linux-amd64.deb "https://download.splunk.com/products/splunk/releases/10.0.0/linux/splunk-10.0.0-e8eb0c4654f8-linux-amd64.deb"
    - Install:
      ```bash
      sudo dpkg -i splunk-<version>-linux-2.6-amd64.deb
