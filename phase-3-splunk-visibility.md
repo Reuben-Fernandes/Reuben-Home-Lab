@@ -12,7 +12,7 @@ Centralize logs from critical systems (pfSense, Ubuntu) into **Splunk Free Tier*
   - Installed using `.deb` package from Splunk site
   - Listens on:
     - TCP `9997` for Universal Forwarders
-    - UDP `514` for pfSense syslog
+    - UDP `9969` for pfSense syslog (having issues with 514)
   - Use cases:
     - Port scanning detection
     - Failed login attempts
